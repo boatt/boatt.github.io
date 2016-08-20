@@ -51,14 +51,14 @@ index:
 #### 作者信息
 author:
   name: ## 作者名
-  intro_line1:  "Hello ,I'm Larry Page in Google."    ## 网站底部的个人介绍
-  intro_line2:  "This is my blog,believe it or not."  
+  intro_line1:  "Hi,我是Boat,这是我的博客,我会在上面更新一些文章"    ## 网站底部的个人介绍
+  intro_line2:  "欢迎Star哟."  
   weibo_verifier:  ## 微博秀的验证码
   tsina:           ## 用于微博秀和微博分享
   weibo:           ## 用于显示网站底部社交按钮，下同
   douban:         
   zhihu:  
-  email:     
+  email:  "791008594@qq.com"     
   twitter:   
   github:     
   facebook: 
@@ -83,7 +83,7 @@ disqus_shortname:
 
 #### 分享按钮
 jiathis:
-  enable: false   ## 默认使用主题内建分享
+  enable: true   ## 默认使用主题内建分享
   id:    
   tsina: 
   

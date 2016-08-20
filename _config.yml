@@ -24,8 +24,8 @@ redcarpet:
     - with_toc_data
     
 
-title : Jekyll Jacman
-tagline: A fresh looking and responsive theme for Jekyll
+title : Boat Blog
+tagline: Look like a boat 看起来像船
 
 defaults:
   -
