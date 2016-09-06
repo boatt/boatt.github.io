@@ -25,7 +25,7 @@ redcarpet:
     
 
 title : Boat Blog
-tagline: Look like a boat 看起来像船
+tagline: Look like a boat
 
 defaults:
   -
@@ -79,8 +79,8 @@ mathjax: false      #enable mathjax if true
 
 #### Author information
 author:
-  name: yitao      ## e.g. wuchong Author name
-  intro_line1:  "Hi.这是我的Bolg,我会在上面更新一些android方面的文章哦."    ## your introduction on the bottom of the page
+  name: boatt      ## e.g. wuchong Author name
+  intro_line1:  "Hi.I am a mobile developer, I will always be here to update some of the blog, please pay attention to Oh."    ## your introduction on the bottom of the page
   intro_line2:  "欢迎shar哟."  ## the 2nd line
   weibo:      ## e.g. wuchong1014 or 2176287895 for http://weibo.com/2176287895
   weibo_verifier:  ## e.g. b3593ceb Your weibo-show widget verifier ,if you use weibo-show it is needed.
@@ -105,7 +105,7 @@ toc:
 
 #### Links
 links:
-  码农圈: https://github.com/boatt
+  开源动画: https://github.com/boatt
   Boat Blog: https://github.com/boatt
 
 
