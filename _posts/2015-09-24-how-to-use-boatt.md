@@ -1,481 +1,84 @@
 ---
-layout: post
-title: EventBus的使用和原理剖析
+luolayout: post
+title: Android开源项目推荐之「网络请求哪家强」
 tags:
 - boatt
 - Jacman
 categories: boatt
-description: 在编程过程中，当我们想通知其他组件某些事情发生时，我们通常使用观察者模式，正式因为观察者模式非常常见，所以在jdk1.5中已经帮助我们实现了观察者模式，我们只需要简单的继承一些类就可以快速使用观察者模式，在Android中也有一个类似功能的开源库EventBus，可以很方便的帮助我们实现观察者模式，那么我们就开始学习如何使用EventBus.
+description: 不少人老催这个系列，好吧，今天就更新一篇干货给你们。网络请求这个话题基本是所有 App 开发都会遇到的，这也难怪之前很多人留言让我写写网络请求到底该怎么选择，今天就来说说网络请求到底哪家强.
 ---
 ## 主题描述
-在编程过程中，当我们想通知其他组件某些事情发生时，我们通常使用观察者模式，正式因为观察者模式非常常见，所以在jdk1.5中已经帮助我们实现了观察者模式，我们只需要简单的继承一些类就可以快速使用观察者模式，在Android中也有一个类似功能的开源库EventBus，可以很方便的帮助我们实现观察者模式，那么我们就开始学习如何使用EventBus--查看更多。
+不少人老催这个系列，好吧，今天就更新一篇干货给你们。网络请求这个话题基本是所有 App 开发都会遇到的，这也难怪之前很多人留言让我写写网络请求到底该怎么选择，今天就来说说网络请求到底哪家强！
 
 <!-- more -->
 ## 日志详情
 
-> 在编程过程中，当我们想通知其他组件某些事情发生时，我们通常使用观察者模式，正式因为观察者模式非常常见，所以在jdk1.5中已经帮助我们实现了观察者模式，我们只需要简单的继承一些类就可以快速使用观察者模式，在Android中也有一个类似功能的开源库EventBus，可以很方便的帮助我们实现观察者模式，那么我们就开始学习如何使用EventBus.
+> Android开源项目推荐之「网络请求哪家强」
 >
->       在接下来的内容中，我首先会介绍如何使用EventBus,然后再简单的学习一下EventBus的底层实现原理，因为仅仅学习如何使用总是感觉内心不够踏实，万一哪天出了Bug也无从下手，了解了它的基本实现后，就会用得游刃有余。好了 废话不多说，下面开始学习吧
+> 不少人老催这个系列，好吧，今天就更新一篇干货给你们。网络请求这个话题基本是所有 App 开发都会遇到的，这也难怪之前很多人留言让我写写网络请求到底该怎么选择，今天就来说说网络请求到底哪家强！
 >
-> 1、下载EventBus库：
+> ## 1. 原则
 >
-> EvnetBus的下载地址：https://github.com/greenrobot/EventBus.git
+> 本篇说的网络请求专指 http 请求，在选择一个框架之前，我个人有个习惯，就是我喜欢选择专注的库，其实在软件设计领域有一个原则叫做 「单一职责原则」，跟我所说的「专注」不谋而合，一个库能把一件事做好就很不错了。现如今有很多大而全的库，比如这个库可以网络请求，同时又可以图片加载，又可以数据存储，又可以 View 注解等等，我们使用这种库当然方便了，但是你有没有想过？这样会使得你整个项目对它依赖性太强，万一以后这个库不维护了，或者中间某个模块出问题了，这个影响非常大，而且我一直认为大而全的框架可能某一块都做的不够好，所以我在选择的时候更喜欢专注某一领域的框架。
 >
-> 2、将EventBus.jar放入自己工程的libs目录即可
+> 在上面原则的基础上，所以目前来说单纯的网络请求库就锁定在了 Volley、OkHttp、Retrofit 三个，android-async-http 的作者已经不维护，所以这里就不多说了，下面我们分别来说说这三个库的区别。
 >
-> 3、定义一个事件，这个事件一旦被EventBus分发出去就是代表某一件事情发生了，这个事件就是某个观察者关心的事情(不需要继承任何类)
+> ## 2. OkHttp
 >
-> 4、定义观察者，然后将该观察者注册到EventBus
+> 我们知道在 Android 开发中是可以直接使用现成的 api 进行网络请求的，就是使用 HttpClient、HttpUrlConnection 进行操作，目前 HttpClient 已经被废弃，而 android-async-http 是基于 HttpClient 的，我想可能也是因为这个原因作者放弃维护。
 >
-> 5、由EventBus分发事件，告知观察者某一件事情发生了
+> 而 OkHttp 是 Square 公司开源的针对 Java 和 Android 程序，封装的一个高性能 http 请求库，所以它的职责跟 HttpUrlConnection 是一样的，支持 spdy、http 2.0、websocket ，支持同步、异步，而且 OkHttp 又封装了线程池，封装了数据转换，封装了参数使用、错误处理等，api 使用起来更加方便。可以把它理解成是一个封装之后的类似 HttpUrlConnection 的一个东西，但是你在使用的时候仍然需要自己再做一层封装，这样才能像使用一个框架一样更加顺手。
 >
-> 6、使用完成后从EventBus中反注册观察者。
+> OkHttp 的具体使用方法这里就不赘述，地址在这里：
 >
-> 熟悉观察者模式的朋友肯定对于上面的流程非常熟悉，其实和观察模式基本是一样的。但是也是有区别的。在观察者模式中，所有的观察者都需要实现一个接口，这个接口有一个统一的方法如:
+> [http://square.github.io/okhttp/**](https://link.zhihu.com/?target=http%3A//square.github.io/okhttp/)
 >
-> public void onUpdate()；
+> ## 3. Volley
 >
-> 然后当某一个事件发生时，某个对象会调用观察者的onUpdate方法通知观察者某件事情发生了，但是在EventBus中不需要这样，EventBus中是这样实现的：
+> Volley 是 Google 官方出的一套小而巧的异步请求库，该框架封装的扩展性很强，支持 HttpClient、HttpUrlConnection，甚至支持 OkHttp，具体方法可以看 Jake 大神的这个 Gist 文件：
 >
-> 在EventBus中的观察者通常有四种订阅函数（就是某件事情发生被调用的方法）
+> [https://gist.github.com/JakeWharton/5616899**](https://link.zhihu.com/?target=https%3A//gist.github.com/JakeWharton/5616899)
 >
-> 1、onEvent
+> 而且 Volley 里面也封装了 ImageLoader ，所以如果你愿意你甚至不需要使用图片加载框架，不过这块功能没有一些专门的图片加载框架强大，对于简单的需求可以使用，对于稍复杂点的需求还是需要用到专门的图片加载框架。
 >
-> 2、onEventMainThread
+> Volley 也有缺陷，比如不支持 post 大数据，所以不适合上传文件。不过 Volley 设计的初衷本身也就是为频繁的、数据量小的网络请求而生！
 >
-> 3、onEventBackground
+> 关于 Volley 的具体用法可以见我很早在 GitHub 的一个 demo ：
 >
-> 4、onEventAsync
+> [https://github.com/stormzhang/AndroidVolley**](https://link.zhihu.com/?target=https%3A//github.com/stormzhang/AndroidVolley)
 >
-> 这四种订阅函数都是使用onEvent开头的，它们的功能稍有不同,在介绍不同之前先介绍两个概念：
+> ## 4. Retrofit
 >
-> 告知观察者事件发生时通过EventBus.post函数实现，这个过程叫做事件的发布，观察者被告知事件发生叫做事件的接收，是通过下面的订阅函数实现的。
+> Retrofit 是 Square 公司出品的默认基于 OkHttp 封装的一套 RESTful 网络请求框架，不了解 RESTful 概念的不妨去搜索学习下，RESTful 可以说是目前流行的一套 api 设计的风格，并不是标准。Retrofit 的封装可以说是很强大，里面涉及到一堆的设计模式，你可以通过注解直接配置请求，你可以使用不同的 http 客户端，虽然默认是用 http ，可以使用不同 Json Converter 来序列化数据，同时提供对 RxJava 的支持，使用 Retrofit + OkHttp + RxJava + Dagger2 可以说是目前比较潮的一套框架，但是需要有比较高的门槛。
 >
-> onEvent:如果使用onEvent作为订阅函数，那么该事件在哪个线程发布出来的，onEvent就会在这个线程中运行，也就是说发布事件和接收事件线程在同一个线程。使用这个方法时，在onEvent方法中不能执行耗时操作，如果执行耗时操作容易导致事件分发延迟。
+> Retrofit 的具体使用方法与地址在这里：
 >
-> onEventMainThread:如果使用onEventMainThread作为订阅函数，那么不论事件是在哪个线程中发布出来的，onEventMainThread都会在UI线程中执行，接收事件就会在UI线程中运行，这个在Android中是非常有用的，因为在Android中只能在UI线程中跟新UI，所以在onEvnetMainThread方法中是不能执行耗时操作的。
+> [http://square.github.io/retrofit/**](https://link.zhihu.com/?target=http%3A//square.github.io/retrofit/)
 >
-> onEvnetBackground:如果使用onEventBackgrond作为订阅函数，那么如果事件是在UI线程中发布出来的，那么onEventBackground就会在子线程中运行，如果事件本来就是子线程中发布出来的，那么onEventBackground函数直接在该子线程中执行。
+> ## 5. Volley VS OkHttp
 >
-> onEventAsync：使用这个函数作为订阅函数，那么无论事件在哪个线程发布，都会创建新的子线程在执行onEventAsync.
+> 毫无疑问 Volley 的优势在于封装的更好，而使用 OkHttp 你需要有足够的能力再进行一次封装。而 OkHttp 的优势在于性能更高，因为 OkHttp 基于 NIO 和 Okio ，所以性能上要比 Volley更快。
 >
-> 下面就通过一个实例来看看这几个订阅函数的使用吧
+> 估计有些读者不理解 IO 和 NIO 的概念，这里姑且简单提下，这两个都是 Java 中的概念，如果我从硬盘读取数据，第一种方式就是程序一直等，数据读完后才能继续操作，这种是最简单的也叫阻塞式 IO，还有一种就是你读你的，我程序接着往下执行，等数据处理完你再来通知我，然后再处理回调。而第二种就是 NIO 的方式，非阻塞式。
 >
-> 1、定义事件：
+> 所以 NIO 当然要比 IO 的性能要好了， 而 Okio 是 Square 公司基于 IO 和 NIO 基础上做的一个更简单、高效处理数据流的一个库。
 >
-> ```
-> public class AsyncEvent
-> {private static final String TAG = "AsyncEvent";
->   public String msg;
->   public AsyncEvent(String msg)
->   {
->     this.msg=msg;
->   }
-> }
-> ```
+> 理论上如果 Volley 和 OkHttp 对比的话，我更倾向于使用 Volley，因为 Volley 内部同样支持使用 OkHttp ，这点 OkHttp 的性能优势就没了，而且 Volley 本身封装的也更易用，扩展性更好些。
 >
-> 其他的事件我就不都贴出来了，我会提供代码的下载的。
+> ## 6. OkHttp VS Retrofit
 >
-> 2、创建观察者（也可以叫订阅者），并实现订阅方法
+> 毫无疑问，Retrofit 默认是基于 OkHttp 而做的封装，这点来说没有可比性，肯定首选 Retrofit。
 >
-> ```
-> public class MainActivity extends Activity
-> {@Overrideprotected void onCreate(Bundle savedInstanceState)
->   {
->     super.onCreate(savedInstanceState);
->     setContentView(R.layout.activity_main);
->     //注册EventBus
->     EventBus.getDefault().register(this);
->   }
+> ## 7. Volley VS Retrofit
 >
->   // click--------------------------------------start----------------------public void methodPost(View view)
->   {
->     Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->     EventBus.getDefault().post(new PostEvent("PostEvent"));
->   }
->   
->   public void methodMain(View view)
->   {
->     Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->     EventBus.getDefault().post(new MainEvent("MainEvent"));
->   }
->   
->   public void methodBack(View view)
->   {
->     Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->     EventBus.getDefault().post(new BackEvent("BackEvent"));
->   }
->   
->   public void methodAsync(View view)
->   {
->     Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->     EventBus.getDefault().post(new AsyncEvent("AsyncEvent"));
->   }
->   
->   public void methodSubPost(View view)
->   {
->     new Thread()
->     {
->       public void run() {
->         Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->         EventBus.getDefault().post(new PostEvent("PostEvent"));
->       };
->     }.start();
->    
->   }
->   
->   public void methodSubMain(View view)
->   {
->     new Thread()
->     {
->       public void run() {
->         Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->         EventBus.getDefault().post(new MainEvent("MainEvent"));
->       };
->     }.start();
->     
->   }
->   
->   public void methodSubBack(View view)
->   {
->     new Thread()
->     {
->       public void run() {
->         Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->         EventBus.getDefault().post(new BackEvent("BackEvent"));
->       };
->     }.start();
->    
->   }
->   
->   public void methodSubAsync(View view)
->   {
->     new Thread()
->     {
->       public void run() {
->         Log.d("yzy", "PostThread-->"+Thread.currentThread().getId());
->         EventBus.getDefault().post(new AsyncEvent("AsyncEvent"));
->       };
->     }.start();
->    
->   }
->   
->   
->   //click--------------------end------------------------------//Event-------------------------start-------------------------------/**
->    * 使用onEvent来接收事件，那么接收事件和分发事件在一个线程中执行
->    * @param event
->    */public void onEvent(PostEvent event)
->   {
->     Log.d("yzy", "OnEvent-->"+Thread.currentThread().getId());
->   }
->   
->   /**
->    * 使用onEventMainThread来接收事件，那么不论分发事件在哪个线程运行，接收事件永远在UI线程执行，
->    * 这对于android应用是非常有意义的
->    * @param event
->    */public void onEventMainThread(MainEvent event)
->   {
->     Log.d("yzy", "onEventMainThread-->"+Thread.currentThread().getId());
->   }
->   
->   /**
->    * 使用onEventBackgroundThread来接收事件，如果分发事件在子线程运行，那么接收事件直接在同样线程
->    * 运行，如果分发事件在UI线程，那么会启动一个子线程运行接收事件
->    * @param event
->    */public void onEventBackgroundThread(BackEvent event)
->   {
->     Log.d("yzy", "onEventBackgroundThread-->"+Thread.currentThread().getId());
->   }
->   /**
->    * 使用onEventAsync接收事件，无论分发事件在（UI或者子线程）哪个线程执行，接收都会在另外一个子线程执行
->    * @param event
->    */public void onEventAsync(AsyncEvent event)
->   {
->     Log.d("yzy", "onEventAsync-->"+Thread.currentThread().getId());
->   }
->   //Event------------------------------end-------------------------------------@Overrideprotected void onDestroy()
->   {
->     //取消注册EventBus
->     EventBus.getDefault().unregister(this);
->     super.onDestroy();
->   }
-> }
-> ```
+> 这两个库都做了非常不错的封装，但是 Retrofit 解耦的更彻底，尤其 Retrofit 2.0 出来，Jake 对之前 1.0 设计不合理的地方做了大量重构，职责更细分，而且 Retrofit 默认使用 OkHttp ，性能上也要比 Volley 占优势，再有如果你的项目如果采用了 RxJava ，那更该使用 Retrofit 。
 >
-> 说明:向EvnetBus中注册订阅者使用EventBus.register方法，取消订阅者使用EvnetBus.unregister方法，通知订阅者某件事情发生，调用EventBus.post方法，具体使用可以看上面的例子。在上面的例子中我创建了4中事件，并且分别中UI线程中post四个事件和在子线程中post四个事件，然后分别打印四种订阅函数所在线程的线程id.
+> 所以说这两个库相比，Retrofit 毫无疑问更有优势，你在能掌握两个框架的前提下该优先使用 Retrofit。但是个人认为 Retrofit 门槛要比 Volley 稍高些，你要理解他的原理，各种用法，想彻底搞明白还是需要花些功夫的，如果你对它一知半解，那还是建议在商业项目使用 Volley 吧。
 >
-> EventBus的使用都在这里了，实在是很简单，但是如果我们在此基础上理解EvnetBus的原理，那么我们就能非常轻松的使用EventBus了。
+> ## 8. 总结
 >
-> 就从EvnetBus的入口开始看吧：EventBus.register
+> 所以综上，如果以上三种网络库你都能熟练掌握，那么优先推荐使用 Retrofit ，前提是最好你们的后台 api 也能遵循 RESTful 的风格，其次如果你不想使用或者没能力掌握 Retrofit ，那么推荐使用 Volley ，毕竟 Volley 你不需要做过多的封装，当然如果你们需要上传大数据，那么不建议使用 Volley，否则你该采用 OkHttp 。
 >
-> ```
-> public void register(Object subscriber) {
->         register(subscriber, DEFAULT_METHOD_NAME, false, 0);
->     }
-> ```
+> 最后，我知道可能有些人会纠结 Volley 与 OkHttp 的选择，那是因为我认为 OkHttp 还是需要一定的能力做一层封装的，如果你有能力封装的话那不如直接用 Retrofit 了，如果没能力封装还是乖乖的用 Volley 吧，如果你能有一些不错的基于 OkHttp 封装好的开源库，那么另说了，Volley 与 OkHttp 怎么选择随你便呗。
 >
-> 其实调用的就是同名函数register，它的四个参数意义分别是：
->
-> subscriber：就是要注册的一个订阅者，
->
-> methodName:就是订阅者默认的订阅函数名，其实就是“onEvent”
->
-> sticky:表示是否是粘性的，一般默认都是false，除非你调用registerSticky方法了
->
-> priority：表示事件的优先级，默认就行，
->
-> 接下来我们就看看这个函数具体干了什么
->
-> ```
-> private synchronized void register(Object subscriber, String methodName, boolean sticky, int priority) {
->         List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriber.getClass(),
->                 methodName);
->         for (SubscriberMethod subscriberMethod : subscriberMethods) {
->             subscribe(subscriber, subscriberMethod, sticky, priority);
->         }
->     }
-> ```
->
-> 通过一个findSubscriberMethods方法找到了一个订阅者中的所有订阅方法，返回一个 List<SubscriberMethod>，进入到findSubscriberMethods看看如何实现的
->
-> ```
-> List<SubscriberMethod> findSubscriberMethods(Class<?> subscriberClass, String eventMethodName) {
->     //通过订阅者类名+"."+"onEvent"创建一个key    String key = subscriberClass.getName() + '.' + eventMethodName;
->     List<SubscriberMethod> subscriberMethods;
->     synchronized (methodCache) {
->       //判断是否有缓存，有缓存直接返回缓存      subscriberMethods = methodCache.get(key);
->     }
->     //第一次进来subscriberMethods肯定是Null    if (subscriberMethods != null) {
->       return subscriberMethods;
->     }
->     subscriberMethods = new ArrayList<SubscriberMethod>();
->     Class<?> clazz = subscriberClass;
->     HashSet<String> eventTypesFound = new HashSet<String>();
->     StringBuilder methodKeyBuilder = new StringBuilder();
->     while (clazz != null) {
->       String name = clazz.getName();
->       //过滤掉系统类      if (name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("android.")) {
->         // Skip system classes, this just degrades performance        break;
->       }
->
->       // Starting with EventBus 2.2 we enforced methods to be public (might change with annotations again)      //通过反射，获取到订阅者的所有方法      Method[] methods = clazz.getMethods();
->       for (Method method : methods) {
->         String methodName = method.getName();
->         //只找以onEvent开头的方法        if (methodName.startsWith(eventMethodName)) {
->           int modifiers = method.getModifiers();
->           //判断订阅者是否是public的,并且是否有修饰符，看来订阅者只能是public的，并且不能被final，static等修饰          if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
->             //获得订阅函数的参数            Class<?>[] parameterTypes = method.getParameterTypes();
->             //看了参数的个数只能是1个            if (parameterTypes.length == 1) {
->               //获取onEvent后面的部分              String modifierString = methodName.substring(eventMethodName.length());
->               ThreadMode threadMode;
->               if (modifierString.length() == 0) {
->                 //订阅函数为onEvnet                //记录线程模型为PostThread,意义就是发布事件和接收事件在同一个线程执行，详细可以参考我对于四个订阅函数不同点分析                threadMode = ThreadMode.PostThread;
->               } else if (modifierString.equals("MainThread")) {
->                 //对应onEventMainThread                threadMode = ThreadMode.MainThread;
->               } else if (modifierString.equals("BackgroundThread")) {
->                 //对应onEventBackgrondThread                threadMode = ThreadMode.BackgroundThread;
->               } else if (modifierString.equals("Async")) {
->                 //对应onEventAsync                threadMode = ThreadMode.Async;
->               } else {
->                 if (skipMethodVerificationForClasses.containsKey(clazz)) {
->                   continue;
->                 } else {
->                   throw new EventBusException("Illegal onEvent method, check for typos: " + method);
->                 }
->               }
->               //获取参数类型，其实就是接收事件的类型              Class<?> eventType = parameterTypes[0];
->               methodKeyBuilder.setLength(0);
->               methodKeyBuilder.append(methodName);
->               methodKeyBuilder.append('>').append(eventType.getName());
->               String methodKey = methodKeyBuilder.toString();
->               if (eventTypesFound.add(methodKey)) {
->                 // Only add if not already found in a sub class                //封装一个订阅方法对象，这个对象包含Method对象，threadMode对象，eventType对象                subscriberMethods.add(new SubscriberMethod(method, threadMode, eventType));
->               }
->             }
->           } else if (!skipMethodVerificationForClasses.containsKey(clazz)) {
->             Log.d(EventBus.TAG, "Skipping method (not public, static or abstract): " + clazz + "."                + methodName);
->           }
->         }
->       }
->       //看了还会遍历父类的订阅函数      clazz = clazz.getSuperclass();
->     }
->     //最后加入缓存，第二次使用直接从缓存拿    if (subscriberMethods.isEmpty()) {
->       throw new EventBusException("Subscriber " + subscriberClass + " has no public methods called "          + eventMethodName);
->     } else {
->       synchronized (methodCache) {
->         methodCache.put(key, subscriberMethods);
->       }
->       return subscriberMethods;
->     }
->   }
-> ```
->
-> 对于这个方法的讲解都在注释里面了，这里就不在重复叙述了，到了这里我们就找到了一个订阅者的所有的订阅方法
->
-> 我们回到register方法：
->
-> ```
-> for (SubscriberMethod subscriberMethod : subscriberMethods) {
->             subscribe(subscriber, subscriberMethod, sticky, priority);
->         }
-> ```
->
-> 对每一个订阅方法，对其调用subscribe方法，进入该方法看看到底干了什么
->
-> ```
-> private void subscribe(Object subscriber, SubscriberMethod subscriberMethod, boolean sticky, int priority) {
->     subscribed = true;
->     //从订阅方法中拿到订阅事件的类型    Class<?> eventType = subscriberMethod.eventType;
->     //通过订阅事件类型，找到所有的订阅（Subscription）,订阅中包含了订阅者，订阅方法    CopyOnWriteArrayList<Subscription> subscriptions = subscriptionsByEventType.get(eventType);
->     //创建一个新的订阅    Subscription newSubscription = new Subscription(subscriber, subscriberMethod, priority);
->     //将新建的订阅加入到这个事件类型对应的所有订阅列表    if (subscriptions == null) {
->       //如果该事件目前没有订阅列表，那么创建并加入该订阅      subscriptions = new CopyOnWriteArrayList<Subscription>();
->       subscriptionsByEventType.put(eventType, subscriptions);
->     } else {
->       //如果有订阅列表，检查是否已经加入过      for (Subscription subscription : subscriptions) {
->         if (subscription.equals(newSubscription)) {
->           throw new EventBusException("Subscriber " + subscriber.getClass() + " already registered to event "              + eventType);
->         }
->       }
->     }
->
->     //根据优先级插入订阅    int size = subscriptions.size();
->     for (int i = 0; i <= size; i++) {
->       if (i == size || newSubscription.priority > subscriptions.get(i).priority) {
->         subscriptions.add(i, newSubscription);
->         break;
->       }
->     }
->     //将这个订阅事件加入到订阅者的订阅事件列表中    List<Class<?>> subscribedEvents = typesBySubscriber.get(subscriber);
->     if (subscribedEvents == null) {
->       subscribedEvents = new ArrayList<Class<?>>();
->       typesBySubscriber.put(subscriber, subscribedEvents);
->     }
->     subscribedEvents.add(eventType);
->     //这个是对粘性事件的，暂时不讨论    if (sticky) {
->       Object stickyEvent;
->       synchronized (stickyEvents) {
->         stickyEvent = stickyEvents.get(eventType);
->       }
->       if (stickyEvent != null) {
->         postToSubscription(newSubscription, stickyEvent, Looper.getMainLooper() == Looper.myLooper());
->       }
->     }
->   }
-> ```
->
-> 好了，到这里差不多register方法分析完了，大致流程就是这样的，我们总结一下：
->
-> 1、找到被注册者中所有的订阅方法。
->
-> 2、依次遍历订阅方法，找到EventBus中eventType对应的订阅列表，然后根据当前订阅者和订阅方法创建一个新的订阅加入到订阅列表
->
-> 3、找到EvnetBus中subscriber订阅的事件列表，将eventType加入到这个事件列表。
->
-> 所以对于任何一个订阅者，我们可以找到它的 订阅事件类型列表，通过这个订阅事件类型，可以找到在订阅者中的订阅函数。
->
-> register分析完了就分析一下post吧，这个分析完了，EventBus的原理差不多也完了...
->
-> ```
-> public void post(Object event) {
->     //这个EventBus中只有一个，差不多是个单例吧，具体不用细究    PostingThreadState postingState = currentPostingThreadState.get();
->     List<Object> eventQueue = postingState.eventQueue;
->     //将事件放入队列    eventQueue.add(event);
->
->     if (postingState.isPosting) {
->       return;
->     } else {
->       postingState.isMainThread = Looper.getMainLooper() == Looper.myLooper();
->       postingState.isPosting = true;
->       if (postingState.canceled) {
->         throw new EventBusException("Internal error. Abort state was not reset");
->       }
->       try {
->         while (!eventQueue.isEmpty()) {
->           //分发事件          postSingleEvent(eventQueue.remove(0), postingState);
->         }
->       } finally {
->         postingState.isPosting = false;
->         postingState.isMainThread = false;
->       }
->     }
->   }
-> ```
->
-> post里面没有什么具体逻辑，它的功能主要是调用postSingleEvent完成的，进入到这个函数看看吧
->
-> ```
-> private void postSingleEvent(Object event, PostingThreadState postingState) throws Error {
->     Class<? extends Object> eventClass = event.getClass();
->     //找到eventClass对应的事件，包含父类对应的事件和接口对应的事件    List<Class<?>> eventTypes = findEventTypes(eventClass);
->     boolean subscriptionFound = false;
->     int countTypes = eventTypes.size();
->     for (int h = 0; h < countTypes; h++) {
->       Class<?> clazz = eventTypes.get(h);
->       CopyOnWriteArrayList<Subscription> subscriptions;
->       synchronized (this) {
->         //找到订阅事件对应的订阅，这个是通过register加入的（还记得吗....）        subscriptions = subscriptionsByEventType.get(clazz);
->       }
->       if (subscriptions != null && !subscriptions.isEmpty()) {
->         for (Subscription subscription : subscriptions) {
->           postingState.event = event;
->           postingState.subscription = subscription;
->           boolean aborted = false;
->           try {
->             //对每个订阅调用该方法            postToSubscription(subscription, event, postingState.isMainThread);
->             aborted = postingState.canceled;
->           } finally {
->             postingState.event = null;
->             postingState.subscription = null;
->             postingState.canceled = false;
->           }
->           if (aborted) {
->             break;
->           }
->         }
->         subscriptionFound = true;
->       }
->     }
->     //如果没有订阅发现，那么会Post一个NoSubscriberEvent事件    if (!subscriptionFound) {
->       Log.d(TAG, "No subscribers registered for event " + eventClass);
->       if (eventClass != NoSubscriberEvent.class && eventClass != SubscriberExceptionEvent.class) {
->         post(new NoSubscriberEvent(this, event));
->       }
->     }
->   }
-> ```
->
-> 这个方法有个核心方法 postToSubscription方法，进入看看吧
->
-> ```
-> private void postToSubscription(Subscription subscription, Object event, boolean isMainThread) {
->     //第一个参数就是传入的订阅，第二个参数就是对于的分发事件，第三个参数非常关键：是否在主线程switch (subscription.subscriberMethod.threadMode) {
->     //这个threadMode是怎么传入的，仔细想想？是不是根据onEvent,onEventMainThread,onEventBackground,onEventAsync决定的？case PostThread:
->       //直接在本线程中调用订阅函数
->             invokeSubscriber(subscription, event);
->             break;
->         case MainThread:
->             if (isMainThread) {
->         //如果直接在主线程，那么直接在本现场中调用订阅函数  invokeSubscriber(subscription, event);
->             } else {
->         //如果不在主线程，那么通过handler实现在主线程中执行，具体我就不跟踪了  mainThreadPoster.enqueue(subscription, event);
->             }
->             break;
->         case BackgroundThread:
->             if (isMainThread) {
->         //如果主线程，创建一个runnable丢入线程池中  backgroundPoster.enqueue(subscription, event);
->             } else {
->         //如果子线程，则直接调用  invokeSubscriber(subscription, event);
->             }
->             break;
->         case Async:
->       //不论什么线程，直接丢入线程池
->             asyncPoster.enqueue(subscription, event);
->             break;
->         default:
->             throw new IllegalStateException("Unknown thread mode: " + subscription.subscriberMethod.threadMode);
->         }
->     }
-> ```
->
-> 好了 ，对于EventBus的分析就到这里了，有哪里分析不对的，欢迎拍砖。。。
+> 最最后，以上只是我一家之言，如有误导，概不负责！欢迎讨论与交流。
