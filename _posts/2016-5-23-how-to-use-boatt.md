@@ -2,7 +2,7 @@
 layout: post
 title: 热门技术
 tags:
-- java
+- android
 categories: boatt
 description: 热门技术.
 ---

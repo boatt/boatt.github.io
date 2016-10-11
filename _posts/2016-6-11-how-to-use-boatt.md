@@ -2,7 +2,7 @@
 layout: post
 title: 多渠道打包
 tags:
-- java
+- android
 categories: boatt
 description: 多渠道打包.
 ---
