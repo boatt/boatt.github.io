@@ -1,12 +1,5 @@
-_site/*
-_theme_packages/*
-
-Thumbs.db
+.bundle
+.sass-cache
+_site
+Gemfile.lock
 .DS_Store
-
-!.gitkeep
-
-.rbenv-version
-.rvmrc
-
-*.lock
