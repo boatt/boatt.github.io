@@ -24,8 +24,8 @@ redcarpet:
     - with_toc_data
     
 
-title : 船
-tagline: 生命不息,coding不止,一个不断coding的android开发
+title : 船的博客
+tagline: 生命不息,coding不止,一个不断coding的android开发者
 
 defaults:
   -
